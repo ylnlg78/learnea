@@ -16,26 +16,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # 1. Configurer Node.js sur le runner GitHub
+      # 1. Configurer Node.js (sans l'option cache qui faisait planter le script)
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
 
-      # 2. Installer les dépendances du projet
+      # 2. Installer les dépendances (on utilise 'npm install' si pas de lockfile)
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
-      # 3. Compiler le projet pour générer les fichiers (remplit le dossier de build)
+      # 3. Compiler le projet
       - name: Build project
         run: npm run build
 
-      # 4. Déployer le dossier généré sur Cloudflare Pages
+      # 4. Déployer sur Cloudflare Pages
       - name: Publish to Cloudflare Pages
         uses: cloudflare/pages-action@v1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           projectName: 'atelier-sous-reseaux'
-          directory: 'dist' # Modifiez 'dist' par 'build' ou 'out' si votre framework utilise un autre nom
+          directory: 'dist' # Vérifiez bien si votre dossier de build local s'appelle 'dist'
